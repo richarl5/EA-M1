@@ -55,9 +55,12 @@ function updateSubjectStudent(req, res) {
     StudentSchema.findOne({name : req.body.student}, function (err,student) {
         if(err) return res.status(500).send({message : 'Error reading data base'});
         if(!student) return res.status(404).send({message : 'Student does not exist'});
-        SubjectSchema.findOneAndUpdate({name : req.params.subject}, {$push: {students: student._id.toString()}}, {new : true}, function (err,userUpdated) {
+        SubjectSchema.findOneAndUpdate({name : req.params.subject}, {$push: {students: student._id.toString()}}, {new : true}, function (err,subjectUpdated) {
             if (err) return res.status(500).send({message: 'Error updating data base'});
-            if (!userUpdated) return res.status(404).send({message: 'Subject does not exist'});
+            if (!subjectUpdated) return res.status(404).send({message: 'Subject does not exist'});
+            student.update({$push: {subjects: subjectUpdated._id.toString()}}, {new: true},function (err) {
+                if (err) return res.status(500).send({message: 'Error updating data base'});
+            });
             res.status(200).send({message : 'Subject has been updated'});
         });
     })
